@@ -1,6 +1,6 @@
 import requests
 
-languages = ["Python", "Java", "Javascript"]
+languages = ["Python", "Java", "Javascript", "C", "C#", "F#"]
 languages_vatations = {}
 
 for language in languages:
