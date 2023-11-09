@@ -15,6 +15,20 @@ import requests
 #     languages_vacations[language] = count
 # print(languages_vacations)
 # выводим зарплату из вакансий
+def predict_rub_salary(salary):
+    if salary == None:
+        print("None")
+    else:
+        if str(salary["currency"]) == "RUR":
+            if salary["from"] == None:
+                mid = int(salary["to"])*0.8
+                print(mid)
+            elif salary["to"] == None:
+                mid = int(salary["from"])*1.2
+                print(mid)       
+            else:
+                mid = (int(salary["from"]) + int(salary["to"]))/2
+                print(mid)
 language = "Python"
 params = {
     "text": language,
@@ -25,4 +39,5 @@ response.raise_for_status()
 language_info = response.json()
 vacations = language_info["items"]
 for vacation in vacations:
-    print(vacation["salary"])
+    salary = vacation["salary"]
+    predict_rub_salary(salary)
