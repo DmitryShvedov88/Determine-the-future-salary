@@ -61,27 +61,33 @@ languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Gol
 languages_vacations = {}
 
 for language in languages:
-    params = {
-        "text": language,
-        "date_from": "2023-10-15"
+    page = 0
+    while page < pages_number:
+        params = {
+            "text": language,
         }
-    response = requests.get('https://api.hh.ru/vacancies/',  params=params)
-    response.raise_for_status()
-    language_info = response.json()
-    count = language_info["found"]
-    languages_vacations[language] = {"vacancies_found": count}
-    vacations = language_info["items"]
-    mid_summ = 0
-    vacancies_processed = 0
-    for vacation in vacations:
-        salary = vacation["salary"]
-        if salary:
-            mid = predict_rub_salary(salary)
-            if mid:
-                mid_summ += mid
-                vacancies_processed += 1
-    languages_vacations[language]["vacancies_processed"] = vacancies_processed
-    average_salary = mid_summ/vacancies_processed
-    languages_vacations[language]["average_salary"] = average_salary
+        response = requests.get('https://api.hh.ru/vacancies/',  params=params)
+        response.raise_for_status()
+        language_info = response.json()
+        
+        page_payload = page_response.json()
+        pages_number = page_payload['pages_number']
+        page += 1
+        
+        count = language_info["found"]
+        languages_vacations[language] = {"vacancies_found": count}
+        vacations = language_info["items"]
+        mid_summ = 0
+        vacancies_processed = 0
+        for vacation in vacations:
+            salary = vacation["salary"]
+            if salary:
+                mid = predict_rub_salary(salary)
+                if mid:
+                    mid_summ += mid
+                    vacancies_processed += 1
+        languages_vacations[language]["vacancies_processed"] = vacancies_processed
+        average_salary = mid_summ/vacancies_processed
+        languages_vacations[language]["average_salary"] = average_salary
     
 print(languages_vacations)
