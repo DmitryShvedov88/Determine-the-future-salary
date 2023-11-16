@@ -62,18 +62,17 @@ languages_vacations = {}
 
 for language in languages:
     page = 0
-    while page < pages_number:
+    pages_number = 1
+    while page < 2:
         params = {
             "text": language,
-        }
+            }
         response = requests.get('https://api.hh.ru/vacancies/',  params=params)
         response.raise_for_status()
-        language_info = response.json()
-        
-        page_payload = page_response.json()
-        pages_number = page_payload['pages_number']
+        language_info = response.json() 
+        pages_number = language_info['pages']
         page += 1
-        
+        print(page)
         count = language_info["found"]
         languages_vacations[language] = {"vacancies_found": count}
         vacations = language_info["items"]
@@ -89,5 +88,4 @@ for language in languages:
         languages_vacations[language]["vacancies_processed"] = vacancies_processed
         average_salary = mid_summ/vacancies_processed
         languages_vacations[language]["average_salary"] = average_salary
-    
-print(languages_vacations)
+    print(languages_vacations)
