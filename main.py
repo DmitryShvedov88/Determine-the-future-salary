@@ -33,8 +33,7 @@ import requests
 # language = "Python"
 # params = {
 #     "text": language,
-#     "date_from": "2023-10-15"  
-#     }
+#     "date_from": "2023-10-15"
 # response = requests.get('https://api.hh.ru/vacancies/',  params=params)
 # response.raise_for_status()
 # language_info = response.json()
@@ -54,7 +53,7 @@ def predict_rub_salary(salary):
             midlle = int(salary["from"])*1.2
         else:
             midlle = (int(salary["from"]) + int(salary["to"]))/2
-        return midlle 
+        return midlle
 
 
 languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang"]
@@ -69,10 +68,9 @@ for language in languages:
             }
         response = requests.get('https://api.hh.ru/vacancies/',  params=params)
         response.raise_for_status()
-        language_info = response.json() 
+        language_info = response.json()
         pages_number = language_info['pages']
         page += 1
-        print(page)
         count = language_info["found"]
         languages_vacations[language] = {"vacancies_found": count}
         vacations = language_info["items"]
@@ -88,4 +86,5 @@ for language in languages:
         languages_vacations[language]["vacancies_processed"] = vacancies_processed
         average_salary = mid_summ/vacancies_processed
         languages_vacations[language]["average_salary"] = average_salary
-    print(languages_vacations)
+for language in languages_vacations.items():
+    print(language[0], language[1])
