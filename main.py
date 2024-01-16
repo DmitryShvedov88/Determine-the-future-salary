@@ -99,10 +99,10 @@ load_dotenv(find_dotenv())
 #params = {"Authorization": os.getenv("superjob_key")}
 #params = {"Authorization": f'Bearer X-Api-App-Id'}
 headers = {"X-Api-App-Id": os.getenv("superjob_key")}
-
-response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers)
+params = {"keywords": "1: Программист", "town": "Москва"}
+response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
 response.raise_for_status()
-language_info = response.json()
-language = language_info["objects"]
-for i in language:
-    print(i["profession"])
+vacations_info = response.json()
+vacations = vacations_info["objects"]
+for i in vacations:
+    print(i["profession"], i["town"]["title"])
