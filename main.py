@@ -47,15 +47,16 @@ from dotenv import load_dotenv, find_dotenv
 # находим количество вакансий по языка, среднюю запрлату и кол вакансий из которых считали среднюю 
 
 
-# def predict_rub_salary(salary):
-#     if str(salary["currency"]) == "RUR":
-#         if salary["from"] == None:
-#             midlle = int(salary["to"])*0.8
-#         elif salary["to"] == None:
-#             midlle = int(salary["from"])*1.2
-#         else:
-#             midlle = (int(salary["from"]) + int(salary["to"]))/2
-#         return midlle
+def predict_rub_salary(salary_from, salary_to):
+        if salary_from == None:
+            midlle = int(salary_to)*0.8
+        elif salary_to == None:
+            midlle = int(salary_from)*1.2
+        else:
+            midlle = (int(salary_from) + int(salary_to))/2
+        if midlle == 0:
+            return None
+        return midlle
 
 
 # languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang"]
@@ -80,8 +81,9 @@ from dotenv import load_dotenv, find_dotenv
 #         vacancies_processed = 0
 #         for vacation in vacations:
 #             salary = vacation["salary"]
-#             if salary:
-#                 mid = predict_rub_salary(salary)
+#             if str(salary["currency"]) == "RUR":
+#                 salary_from, salary_to = salary["from"], salary["to"]
+#                 mid = predict_rub_salary(salary_from, salary_to)
 #                 if mid:
 #                     mid_summ += mid
 #                     vacancies_processed += 1
@@ -91,6 +93,13 @@ from dotenv import load_dotenv, find_dotenv
 # for language in languages_vacations.items():
 #     print(language[0], language[1])
 
+#def predict_salary(salary_from, salary_to):
+# common prediction logic
+
+#выводим зщарплату по вакансии в НН
+#def predict_rub_salary_hh(vacancy):
+# return number or None
+
 #Запрос к сайту СуперДжоб
 load_dotenv(find_dotenv())
 #params = {"X-Api-App-Id": os.getenv("superjob_key")}
@@ -98,11 +107,18 @@ load_dotenv(find_dotenv())
 #params = {"Authorization": 'X-Api-App-Id'}
 #params = {"Authorization": os.getenv("superjob_key")}
 #params = {"Authorization": f'Bearer X-Api-App-Id'}
+
+def predict_rub_salary_sj(vacation):
+# return number or None
+    salary_from, salary_to = vacation["payment_from"], vacation["payment_to"]
+    mid = predict_rub_salary(salary_from, salary_to)
+    print(vacation["profession"], vacation["town"]["title"], mid)
+
 headers = {"X-Api-App-Id": os.getenv("superjob_key")}
 params = {"keywords": "1: Программист", "town": "Москва"}
 response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
 response.raise_for_status()
 vacations_info = response.json()
 vacations = vacations_info["objects"]
-for i in vacations:
-    print(i["profession"], i["town"]["title"])
+for vacation in vacations:
+    predict_rub_salary_sj(vacation)
