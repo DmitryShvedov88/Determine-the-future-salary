@@ -104,50 +104,44 @@ def predict_rub_salary(salary_from, salary_to):
 load_dotenv(find_dotenv())
 
 
-def predict_rub_salary_sj(vacation):
-#return number or None
-    #print(vacation)
-    salary_from, salary_to = vacation["payment_from"], vacation["payment_to"]
-    mid = predict_rub_salary(salary_from, salary_to)
-    print(vacation["profession"], vacation["town"]["title"], mid)
+def predict_rub_salary_sj(vacation, mid_summ, vacancies_processed):
+    print("id:", vacation["id"])
+    payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
+    print(payment_from, payment_to)
+    mid = predict_rub_salary(payment_from, payment_to)
+    if mid:
+        mid_summ += mid
+        vacancies_processed += 1
+        print("mid_summ_2:", mid_summ, "vacancies_processed_2:", vacancies_processed)
 
 
-languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang", "SQL"]
+
+
+languages = ["Python", "Си", "SQL"]
+#["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang", "SQL"]
 languages_vacations = {}
 
 for language in languages:
-    print(language)
     vacation_number = 0
     vacations_number = 1
     headers = {"X-Api-App-Id": os.getenv("superjob_key")}
-    params = {"keywords": f"1: Программист {language}", "town": "Москва"}
+    params = {"keyword": f"{language}", "town": "Москва"}
     response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
     response.raise_for_status()
     vacations_info = response.json()
+    count = vacations_info["total"]
     vacations = vacations_info["objects"]
     count = vacations_info["total"]
-    print(count)
+    print(language)
     languages_vacations[language] = {"vacancies_found": count}
-    for vacation in vacations:
-        while vacation_number < 3:
-            mid_summ = 0
-            vacancies_processed = 0
-            vacation_number += 1
-            print("vacation_number", vacation_number)
-            print(vacation["profession"])
+    mid_summ = 0
+    vacancies_processed = 0
+    for vacation in vacations: 
+        vacation_number += 1
+        predict_rub_salary_sj(vacation, mid_summ, vacancies_processed)
+    # languages_vacations[language]["vacancies_processed"] = vacancies_processed
+    # average_salary = mid_summ/vacancies_processed
+    # languages_vacations[language]["average_salary"] = average_salary
 
-
-
-        #     vacation_number +=1
-        #     salary = vacation["salary"]
-        #     if str(salary["currency"]) == "RUR":
-        #         salary_from, salary_to = salary["from"], salary["to"]
-        #         mid = predict_rub_salary(salary_from, salary_to)
-        #         if mid:
-        #             mid_summ += mid
-        #             vacancies_processed += 1
-        # languages_vacations[language]["vacancies_processed"] = vacancies_processed
-        # average_salary = mid_summ/vacancies_processed
-        # languages_vacations[language]["average_salary"] = average_salary
-# for language in languages_vacations.items():
-#     print(language[0], language[1])
+for language in languages_vacations.items():
+    print(language[0], language[1])
