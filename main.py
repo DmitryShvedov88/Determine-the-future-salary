@@ -104,16 +104,14 @@ def predict_rub_salary(salary_from, salary_to):
 load_dotenv(find_dotenv())
 
 
-def predict_rub_salary_sj(vacation, mid_summ, vacancies_processed):
-    print("id:", vacation["id"])
+def predict_rub_salary_sj(vacation):
+#    print("id:", vacation["id"])
+#    print("mid_summ_1:", mid_summ, "vacancies_processed_1:", vacancies_processed)
     payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
-    print(payment_from, payment_to)
+#    print(payment_from, payment_to)
     mid = predict_rub_salary(payment_from, payment_to)
-    if mid:
-        mid_summ += mid
-        vacancies_processed += 1
-        print("mid_summ_2:", mid_summ, "vacancies_processed_2:", vacancies_processed)
-
+    
+    return mid
 
 
 
@@ -136,12 +134,15 @@ for language in languages:
     languages_vacations[language] = {"vacancies_found": count}
     mid_summ = 0
     vacancies_processed = 0
-    for vacation in vacations: 
+    for vacation in vacations:
         vacation_number += 1
-        predict_rub_salary_sj(vacation, mid_summ, vacancies_processed)
-    # languages_vacations[language]["vacancies_processed"] = vacancies_processed
-    # average_salary = mid_summ/vacancies_processed
-    # languages_vacations[language]["average_salary"] = average_salary
+        mid = predict_rub_salary_sj(vacation)
+        if mid:
+            mid_summ += mid
+            vacancies_processed += 1
+    languages_vacations[language]["vacancies_processed"] = vacancies_processed
+    average_salary = int((mid_summ/vacancies_processed)//1)
+    languages_vacations[language]["average_salary"] = average_salary
 
 for language in languages_vacations.items():
     print(language[0], language[1])
