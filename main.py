@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv, find_dotenv
+from terminaltables import AsciiTable
 #находим колличество вакансий на определенном языке
 # languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang"]
 # languages_vacations = {}
@@ -130,7 +131,7 @@ for language in languages:
     count = vacations_info["total"]
     vacations = vacations_info["objects"]
     count = vacations_info["total"]
-    print(language)
+    #print(language)
     languages_vacations[language] = {"vacancies_found": count}
     mid_summ = 0
     vacancies_processed = 0
@@ -144,5 +145,14 @@ for language in languages:
     average_salary = int((mid_summ/vacancies_processed)//1)
     languages_vacations[language]["average_salary"] = average_salary
 
+data = [["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]]
+title = "SuperJob Moscow"
 for language in languages_vacations.items():
-    print(language[0], language[1])
+    language_data = []
+    language_data.append(language[0])
+    for key, value in language[1].items():
+        language_data.append(value)
+    data.append(language_data)
+#print(data)
+table = AsciiTable(data, title)
+print(table.table)
