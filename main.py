@@ -2,6 +2,7 @@ import requests
 import os
 from dotenv import load_dotenv, find_dotenv
 from terminaltables import AsciiTable
+load_dotenv(find_dotenv())
 #находим колличество вакансий на определенном языке
 # languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang"]
 # languages_vacations = {}
@@ -33,6 +34,7 @@ from terminaltables import AsciiTable
 #             else:
 #                 mid = (int(salary["from"]) + int(salary["to"]))/2
 #                 print(mid)
+
 # language = "Python"
 # params = {
 #     "text": language,
@@ -45,9 +47,21 @@ from terminaltables import AsciiTable
 #     salary = vacation["salary"]
 #     predict_rub_salary(salary)
 #
-# находим количество вакансий по языка, среднюю запрлату и кол вакансий из которых считали среднюю 
 
 
+def print_table(title, languages_vacations):
+    data = [["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]]
+    for language in languages_vacations.items():
+        language_data = []
+        language_data.append(language[0])
+        for key, value in language[1].items():
+            language_data.append(value)
+        data.append(language_data)
+    table = AsciiTable(data, title)
+    print(table.table)
+
+
+# находим количество вакансий по языка, среднюю запрлату и кол вакансий из которых считали среднюю
 def predict_rub_salary(salary_from, salary_to):
         if salary_from == None:
             midlle = int(salary_to)*0.8
@@ -60,64 +74,51 @@ def predict_rub_salary(salary_from, salary_to):
         return midlle
 
 
-# languages = ["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang"]
-# languages_vacations = {}
+languages = ["Python", "Си", "SQL"]
+languages_vacations = {}
 
-# for language in languages:
-#     page = 0
-#     pages_number = 1
-#     while page < 2:
-#         params = {
-#             "text": language,
-#             }
-#         response = requests.get('https://api.hh.ru/vacancies/',  params=params)
-#         response.raise_for_status()
-#         language_info = response.json()
-#         pages_number = language_info['pages']
-#         page += 1
-#         count = language_info["found"]
-#         languages_vacations[language] = {"vacancies_found": count}
-#         vacations = language_info["items"]
-#         mid_summ = 0
-#         vacancies_processed = 0
-#         for vacation in vacations:
-#             salary = vacation["salary"]
-#             if str(salary["currency"]) == "RUR":
-#                 salary_from, salary_to = salary["from"], salary["to"]
-#                 mid = predict_rub_salary(salary_from, salary_to)
-#                 if mid:
-#                     mid_summ += mid
-#                     vacancies_processed += 1
-#         languages_vacations[language]["vacancies_processed"] = vacancies_processed
-#         average_salary = mid_summ/vacancies_processed
-#         languages_vacations[language]["average_salary"] = average_salary
-# for language in languages_vacations.items():
-#     print(language[0], language[1])
+for language in languages:
+    page = 0
+    pages_number = 1
+    while page < 2:
+        params = {
+            "text": language,
+            }
+        response = requests.get('https://api.hh.ru/vacancies/',  params=params)
+        response.raise_for_status()
+        language_info = response.json()
+        pages_number = language_info['pages']
+        page += 1
+        count = language_info["found"]
+        languages_vacations[language] = {"vacancies_found": count}
+        vacations = language_info["items"]
+        mid_summ = 0
+        vacancies_processed = 0
+        for vacation in vacations:
+            salary = vacation["salary"]
+            if salary:
+                if str(salary["currency"]) == "RUR":
+                    salary_from, salary_to = salary["from"], salary["to"]
+                    mid = predict_rub_salary(salary_from, salary_to)
+                    if mid:
+                        mid_summ += mid
+                        vacancies_processed += 1
+        languages_vacations[language]["vacancies_processed"] = vacancies_processed
+        average_salary = int((mid_summ/vacancies_processed)//1)
+        languages_vacations[language]["average_salary"] = average_salary
+title = "HeadHunter Moscow"
 
-#def predict_salary(salary_from, salary_to):
-# common prediction logic
 
-#выводим зщарплату по вакансии в НН
-#def predict_rub_salary_hh(vacancy):
-# return number or None
+print_table(title, languages_vacations)
 
 #Запрос к сайту СуперДжоб
-load_dotenv(find_dotenv())
-
 
 def predict_rub_salary_sj(vacation):
-#    print("id:", vacation["id"])
-#    print("mid_summ_1:", mid_summ, "vacancies_processed_1:", vacancies_processed)
     payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
-#    print(payment_from, payment_to)
     mid = predict_rub_salary(payment_from, payment_to)
-    
     return mid
 
-
-
 languages = ["Python", "Си", "SQL"]
-#["Python", "Java", "Javascript", "C", "C#", "F#", "Ruby", "Go", "Golang", "SQL"]
 languages_vacations = {}
 
 for language in languages:
@@ -131,7 +132,6 @@ for language in languages:
     count = vacations_info["total"]
     vacations = vacations_info["objects"]
     count = vacations_info["total"]
-    #print(language)
     languages_vacations[language] = {"vacancies_found": count}
     mid_summ = 0
     vacancies_processed = 0
@@ -145,14 +145,6 @@ for language in languages:
     average_salary = int((mid_summ/vacancies_processed)//1)
     languages_vacations[language]["average_salary"] = average_salary
 
-data = [["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]]
 title = "SuperJob Moscow"
-for language in languages_vacations.items():
-    language_data = []
-    language_data.append(language[0])
-    for key, value in language[1].items():
-        language_data.append(value)
-    data.append(language_data)
-#print(data)
-table = AsciiTable(data, title)
-print(table.table)
+
+print_table(title, languages_vacations)
