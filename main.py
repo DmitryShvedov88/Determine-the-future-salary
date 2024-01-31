@@ -35,62 +35,70 @@ def predict_rub_salary(salary_from, salary_to):
 
 
 # Запрос к сайту НН
-for language in languages:
-    page = 0
-    pages_number = 1
-    while page < 2:
-        params = {
-            "text": language,
-            }
-        response = requests.get('https://api.hh.ru/vacancies/',  params=params)
+def take_hh_vacations():
+    for language in languages:
+        page = 0
+        pages_number = 1
+        while page < 2:
+            params = {
+                "text": language,
+                }
+            response = requests.get('https://api.hh.ru/vacancies/',  params=params)
+            response.raise_for_status()
+            language_info = response.json()
+            pages_number = language_info['pages']
+            page += 1
+            count = language_info["found"]
+            languages_vacations[language] = {"vacancies_found": count}
+            vacations = language_info["items"]
+            mid_summ = 0
+            vacancies_processed = 0
+            for vacation in vacations:
+                salary = vacation["salary"]
+                if salary:
+                    if str(salary["currency"]) == "RUR":
+                        salary_from, salary_to = salary["from"], salary["to"]
+                        mid = predict_rub_salary(salary_from, salary_to)
+                        if mid:
+                            mid_summ += mid
+                            vacancies_processed += 1
+            languages_vacations[language]["vacancies_processed"] = vacancies_processed
+            average_salary = int((mid_summ/vacancies_processed)//1)
+            languages_vacations[language]["average_salary"] = average_salary
+    title = "HeadHunter Moscow"
+    made_table(title, languages_vacations)
+
+# Запрос к сайту СуперДжоб
+
+def take_sj_vacations():
+    for language in languages:
+        vacation_number = 0
+        vacations_number = 1
+        headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
+        params = {"keyword": f"{language}", "town": "Москва"}
+        response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
         response.raise_for_status()
-        language_info = response.json()
-        pages_number = language_info['pages']
-        page += 1
-        count = language_info["found"]
+        vacations_info = response.json()
+        count = vacations_info["total"]
+        vacations = vacations_info["objects"]
+        count = vacations_info["total"]
         languages_vacations[language] = {"vacancies_found": count}
-        vacations = language_info["items"]
         mid_summ = 0
         vacancies_processed = 0
         for vacation in vacations:
-            salary = vacation["salary"]
-            if salary:
-                if str(salary["currency"]) == "RUR":
-                    salary_from, salary_to = salary["from"], salary["to"]
-                    mid = predict_rub_salary(salary_from, salary_to)
-                    if mid:
-                        mid_summ += mid
-                        vacancies_processed += 1
+            vacation_number += 1
+            payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
+            mid = predict_rub_salary(payment_from, payment_to)
+            if mid:
+                mid_summ += mid
+                vacancies_processed += 1
         languages_vacations[language]["vacancies_processed"] = vacancies_processed
         average_salary = int((mid_summ/vacancies_processed)//1)
         languages_vacations[language]["average_salary"] = average_salary
-title = "HeadHunter Moscow"
-made_table(title, languages_vacations)
+    title = "SuperJob Moscow"
+    made_table(title, languages_vacations)
 
-# Запрос к сайту СуперДжоб
-for language in languages:
-    vacation_number = 0
-    vacations_number = 1
-    headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
-    params = {"keyword": f"{language}", "town": "Москва"}
-    response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
-    response.raise_for_status()
-    vacations_info = response.json()
-    count = vacations_info["total"]
-    vacations = vacations_info["objects"]
-    count = vacations_info["total"]
-    languages_vacations[language] = {"vacancies_found": count}
-    mid_summ = 0
-    vacancies_processed = 0
-    for vacation in vacations:
-        vacation_number += 1
-        payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
-        mid = predict_rub_salary(payment_from, payment_to)
-        if mid:
-            mid_summ += mid
-            vacancies_processed += 1
-    languages_vacations[language]["vacancies_processed"] = vacancies_processed
-    average_salary = int((mid_summ/vacancies_processed)//1)
-    languages_vacations[language]["average_salary"] = average_salary
-title = "SuperJob Moscow"
-made_table(title, languages_vacations)
+
+if __name__ == "__main__":
+    take_hh_vacations()
+    take_sj_vacations()
