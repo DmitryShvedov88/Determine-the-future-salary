@@ -3,7 +3,7 @@
 This program made for education purpose
 It show vacations from [hh.ru](https://hh.ru/), [spurjob](https://www.superjob.ru/) in two tables, it's requests data on programmer vacancies.
 The result of the program will be two tables with data from two sites, respectively. 
-There will be 4 columns in each column. The programming language, the number of vacancies, how many vacancies have been processed and the average salary.
+There will be 4 columns in each table. The programming language, the number of vacancies, how many vacancies have been processed and the average salary.
 
 ### How to install
 
