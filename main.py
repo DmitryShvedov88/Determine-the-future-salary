@@ -8,6 +8,7 @@ load_dotenv(find_dotenv())
 languages = ["Python", "Си", "SQL"]
 languages_vacations = {}
 
+
 # делаем таблицу и выводим на экран
 def made_table(title, languages_vacations):
     data = [["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]]
