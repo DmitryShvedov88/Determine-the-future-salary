@@ -5,7 +5,11 @@ from terminaltables import AsciiTable
 load_dotenv(find_dotenv())
 
 
-def print_table(title, languages_vacations):
+languages = ["Python", "Си", "SQL"]
+languages_vacations = {}
+
+
+def made_table(title, languages_vacations):
     data = [["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]]
     for language in languages_vacations.items():
         language_data = []
@@ -17,9 +21,7 @@ def print_table(title, languages_vacations):
     print(table.table)
 
 
-# находим количество вакансий по языка, среднюю запрлату и кол вакансий из которых считали среднюю
-
-
+# находим количество вакансий по языка, среднюю зарплату и кол вакансий из которых считали среднюю
 def predict_rub_salary(salary_from, salary_to):
     if salary_from == None:
         midlle = int(salary_to)*0.8
@@ -30,12 +32,9 @@ def predict_rub_salary(salary_from, salary_to):
     if midlle == 0:
         return None
     return midlle
-# Запрос к сайту СуперДжоб
 
 
-languages = ["Python", "Си", "SQL"]
-languages_vacations = {}
-
+# Запрос к сайту НН
 for language in languages:
     page = 0
     pages_number = 1
@@ -66,22 +65,9 @@ for language in languages:
         average_salary = int((mid_summ/vacancies_processed)//1)
         languages_vacations[language]["average_salary"] = average_salary
 title = "HeadHunter Moscow"
-
-
-print_table(title, languages_vacations)
+made_table(title, languages_vacations)
 
 # Запрос к сайту СуперДжоб
-
-
-def predict_rub_salary_sj(vacation):
-    payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
-    mid = predict_rub_salary(payment_from, payment_to)
-    return mid
-
-
-languages = ["Python", "Си", "SQL"]
-languages_vacations = {}
-
 for language in languages:
     vacation_number = 0
     vacations_number = 1
@@ -98,14 +84,13 @@ for language in languages:
     vacancies_processed = 0
     for vacation in vacations:
         vacation_number += 1
-        mid = predict_rub_salary_sj(vacation)
+        payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
+        mid = predict_rub_salary(payment_from, payment_to)
         if mid:
             mid_summ += mid
             vacancies_processed += 1
     languages_vacations[language]["vacancies_processed"] = vacancies_processed
     average_salary = int((mid_summ/vacancies_processed)//1)
     languages_vacations[language]["average_salary"] = average_salary
-
 title = "SuperJob Moscow"
-
-print_table(title, languages_vacations)
+made_table(title, languages_vacations)
