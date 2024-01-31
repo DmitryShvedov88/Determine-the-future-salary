@@ -8,7 +8,7 @@ load_dotenv(find_dotenv())
 languages = ["Python", "Си", "SQL"]
 languages_vacations = {}
 
-
+# делаем таблицу и выводим на экран
 def made_table(title, languages_vacations):
     data = [["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]]
     for language in languages_vacations.items():
@@ -66,8 +66,8 @@ def take_hh_vacations():
     title = "HeadHunter Moscow"
     made_table(title, languages_vacations)
 
-# Запрос к сайту СуперДжоб
 
+# Запрос к сайту СуперДжоб
 def take_sj_vacations():
     for language in languages:
         vacation_number = 0
