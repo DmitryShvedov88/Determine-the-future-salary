@@ -85,7 +85,7 @@ languages_vacations = {}
 for language in languages:
     vacation_number = 0
     vacations_number = 1
-    headers = {"X-Api-App-Id": os.getenv("superjob_key")}
+    headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
     params = {"keyword": f"{language}", "town": "Москва"}
     response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
     response.raise_for_status()
