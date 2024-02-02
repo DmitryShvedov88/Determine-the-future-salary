@@ -4,7 +4,6 @@ from dotenv import load_dotenv, find_dotenv
 from terminaltables import AsciiTable
 
 
-
 LANGUAGES = [
     "Python",
     "Си",
@@ -13,8 +12,8 @@ LANGUAGES = [
 languages_vacations = {}
 
 
-# делаем таблицу и выводим на экран
 def made_table(title, languages_vacations):
+    """Make a table and display it on the screen"""
     table_header = [
         [
             "Язык программирования",
@@ -33,8 +32,11 @@ def made_table(title, languages_vacations):
     print(table.table)
 
 
-# находим количество вакансий по языка, среднюю зарплату и кол вакансий из которых считали среднюю
 def predict_rub_salary(salary_from, salary_to):
+    """Find the number of vacancies by language,
+    the average salary and the number of vacancies
+    of which we considered the average"""
+
     if salary_from == None:
         midlle = int(salary_to)*0.8
     elif salary_to == None:
@@ -46,8 +48,9 @@ def predict_rub_salary(salary_from, salary_to):
     return midlle
 
 
-# Запрос к сайту НН
 def take_hh_vacations():
+    """Request to the hh.ru website"""
+
     for language in LANGUAGES:
         page = 0
         while page < 2:
@@ -79,8 +82,9 @@ def take_hh_vacations():
     made_table(title, languages_vacations)
 
 
-# Запрос к сайту СуперДжоб
 def take_sj_vacations():
+    """Request to the Superjob website"""
+
     for language in LANGUAGES:
         vacation_counter = 0
         headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
