@@ -1,4 +1,4 @@
-### [SpDetermine-the-future-salary](https://github.com/DmitryShvedov88/Determine-the-future-salary "LINK TO THE PROJECT")
+### [Determine-the-future-salary](https://github.com/DmitryShvedov88/Determine-the-future-salary "LINK TO THE PROJECT")
 
 This program made for education purpose
 It show vacations from [hh.ru](https://hh.ru/), [spurjob](https://www.superjob.ru/) in two tables, it's requests data on programmer vacancies.
@@ -22,7 +22,9 @@ But before that, you need to register your future program
 
 ### How to start the programm.
 
-To run the program, you just need to enter "python main.py"
+To run the program, you just need to enter 
+
+    "python main.py"
 
 ### How to check
 Tables from two websites with vacancies in several programming languages will appear in the command line.
