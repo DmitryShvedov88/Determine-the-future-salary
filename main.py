@@ -1,5 +1,6 @@
 import requests
 import os
+import time
 from dotenv import load_dotenv, find_dotenv
 from terminaltables import AsciiTable
 
@@ -9,7 +10,6 @@ LANGUAGES = [
     "Си",
     "SQL"
     ]
-languages_vacations = {}
 
 
 def made_table(title, languages_vacations):
@@ -23,10 +23,9 @@ def made_table(title, languages_vacations):
         ]
     ]
     for language in languages_vacations.items():
-        table_rows = []
-        table_rows.append(language[0])
-        for key, value in language[1].items():
-            table_rows.append(value)
+        table_rows = [language[0]]
+        for param, param_value in language[1].items():
+            table_rows.append(param_value)
         table_header.append(table_rows)
     table = AsciiTable(table_header, title)
     print(table.table)
@@ -51,32 +50,42 @@ def predict_rub_salary(salary_from, salary_to):
 def take_hh_vacations():
     """Request to the hh.ru website"""
 
+    languages_vacations = {}
     for language in LANGUAGES:
+        pages_number = 1
         page = 0
-        while page < 2:
+        while page < 3:
             params = {
                 "text": language,
                 }
-            response = requests.get('https://api.hh.ru/vacancies/',  params=params)
-            response.raise_for_status()
-            page_payload = response.json()
-            page += 1
-            count = page_payload["found"]
-            languages_vacations[language] = {"vacancies_found": count}
-            vacations = page_payload["items"]
-            mid_summ = 0
-            vacancies_processed = 0
-            for vacation in vacations:
-                salary = vacation["salary"]
-                if salary:
-                    if str(salary["currency"]) == "RUR":
-                        salary_from, salary_to = salary["from"], salary["to"]
-                        mid = predict_rub_salary(salary_from, salary_to)
-                        if mid:
-                            mid_summ += mid
-                            vacancies_processed += 1
+            try:
+                response = requests.get('https://api.hh.ru/vacancies/',  params=params)
+                response.raise_for_status()
+                page_payload = response.json()
+                pages_number = page_payload["pages"]
+                page += 1
+                count = page_payload["found"]
+                languages_vacations[language] = {"vacancies_found": count}
+                vacations = page_payload["items"]
+                mid_summ = 0
+                vacancies_processed = 0
+                for vacation in vacations:
+                    salary = vacation["salary"]
+                    if salary:
+                        if str(salary["currency"]) == "RUR":
+                            salary_from, salary_to = salary["from"], salary["to"]
+                            mid = predict_rub_salary(salary_from, salary_to)
+                            if mid:
+                                mid_summ += mid
+                                vacancies_processed += 1
+                                time.sleep(0.1)
+            except requests.exceptions.HTTPError:
+                time.sleep(1)
             languages_vacations[language]["vacancies_processed"] = vacancies_processed
-            average_salary = int((mid_summ/vacancies_processed)//1)
+            if vacancies_processed == 0:
+                average_salary = 0
+            else:
+                average_salary = int((mid_summ/vacancies_processed)//1)
             languages_vacations[language]["average_salary"] = average_salary
     title = "HeadHunter Moscow"
     made_table(title, languages_vacations)
@@ -85,6 +94,7 @@ def take_hh_vacations():
 def take_sj_vacations():
     """Request to the Superjob website"""
 
+    languages_vacations = {}
     for language in LANGUAGES:
         vacation_counter = 0
         headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
@@ -106,7 +116,10 @@ def take_sj_vacations():
                 mid_summ += mid
                 vacancies_processed += 1
         languages_vacations[language]["vacancies_processed"] = vacancies_processed
-        average_salary = int((mid_summ/vacancies_processed)//1)
+        if vacancies_processed == 0:
+            average_salary = 0
+        else:
+            average_salary = int((mid_summ/vacancies_processed)//1)
         languages_vacations[language]["average_salary"] = average_salary
     title = "SuperJob Moscow"
     made_table(title, languages_vacations)
