@@ -22,13 +22,17 @@ def made_table(title, languages_vacations):
             "Средняя зарплата"
         ]
     ]
-    for language in languages_vacations.items():
-        table_rows = [language[0]]
-        for param, param_value in language[1].items():
-            table_rows.append(param_value)
-        table_header.append(table_rows)
+    for language in languages_vacations:
+        table_header.append(
+            [
+                language,
+                languages_vacations[language]["vacancies_found"],
+                languages_vacations[language]["vacancies_processed"],
+                languages_vacations[language]["average_salary"]
+            ]
+        )
     table = AsciiTable(table_header, title)
-    print(table.table)
+    return table
 
 
 def predict_rub_salary(salary_from, salary_to):
@@ -36,9 +40,9 @@ def predict_rub_salary(salary_from, salary_to):
     the average salary and the number of vacancies
     of which we considered the average"""
 
-    if salary_from == None:
+    if salary_to and not salary_from:
         midlle = int(salary_to)*0.8
-    elif salary_to == None:
+    elif salary_from and not salary_to:
         midlle = int(salary_from)*1.2
     else:
         midlle = (int(salary_from) + int(salary_to))/2
@@ -88,16 +92,16 @@ def take_hh_vacations():
                 average_salary = int((mid_summ/vacancies_processed)//1)
             languages_vacations[language]["average_salary"] = average_salary
     title = "HeadHunter Moscow"
-    made_table(title, languages_vacations)
+    table = made_table(title, languages_vacations)
+    print(table.table)
 
 
-def take_sj_vacations():
+def take_sj_vacations(headers):
     """Request to the Superjob website"""
 
     languages_vacations = {}
     for language in LANGUAGES:
         vacation_counter = 0
-        headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
         params = {"keyword": f"{language}", "town": "Москва"}
         response = requests.get('https://api.superjob.ru/2.0/vacancies/',  headers=headers, params=params)
         response.raise_for_status()
@@ -122,10 +126,11 @@ def take_sj_vacations():
             average_salary = int((mid_summ/vacancies_processed)//1)
         languages_vacations[language]["average_salary"] = average_salary
     title = "SuperJob Moscow"
-    made_table(title, languages_vacations)
-
+    table = made_table(title, languages_vacations)
+    print(table.table)
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
+    headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
     take_hh_vacations()
-    take_sj_vacations()
+    take_sj_vacations(headers)
