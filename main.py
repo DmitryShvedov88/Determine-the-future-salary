@@ -12,18 +12,9 @@ LANGUAGES = [
     ]
 
 
-def made_table(title, languages_vacations):
-    """Make a table and display it on the screen"""
-    table_header = [
-        [
-            "Язык программирования",
-            "Вакансий найдено",
-            "Вакансий обработано",
-            "Средняя зарплата"
-        ]
-    ]
+def fill_table(vacation_table, title, languages_vacations):
     for language in languages_vacations:
-        table_header.append(
+        vacation_table.append(
             [
                 language,
                 languages_vacations[language]["vacancies_found"],
@@ -31,7 +22,20 @@ def made_table(title, languages_vacations):
                 languages_vacations[language]["average_salary"]
             ]
         )
-    table = AsciiTable(table_header, title)
+    vacation_table = AsciiTable(vacation_table, title)
+    return vacation_table
+
+
+def made_table():
+    """Make a table and display it on the screen"""
+    table = [
+        [
+            "Язык программирования",
+            "Вакансий найдено",
+            "Вакансий обработано",
+            "Средняя зарплата"
+        ]
+    ]
     return table
 
 
@@ -57,10 +61,12 @@ def take_hh_vacations():
     languages_vacations = {}
     for language in LANGUAGES:
         pages_number = 1
+        days = 1
         page = 0
-        while page < 3:
+        while page < pages_number:
             params = {
                 "text": language,
+                "period": days,
                 }
             try:
                 response = requests.get('https://api.hh.ru/vacancies/',  params=params)
@@ -69,7 +75,6 @@ def take_hh_vacations():
                 pages_number = page_payload["pages"]
                 page += 1
                 count = page_payload["found"]
-                languages_vacations[language] = {"vacancies_found": count}
                 vacations = page_payload["items"]
                 mid_summ = 0
                 vacancies_processed = 0
@@ -85,15 +90,19 @@ def take_hh_vacations():
                                 time.sleep(0.1)
             except requests.exceptions.HTTPError:
                 time.sleep(1)
-            languages_vacations[language]["vacancies_processed"] = vacancies_processed
             if vacancies_processed == 0:
                 average_salary = 0
             else:
                 average_salary = int((mid_summ/vacancies_processed)//1)
-            languages_vacations[language]["average_salary"] = average_salary
+            languages_vacations[language] = {
+                "vacancies_found": count,
+                "vacancies_processed": vacancies_processed,
+                "average_salary": average_salary
+                }
     title = "HeadHunter Moscow"
-    table = made_table(title, languages_vacations)
-    print(table.table)
+    table = made_table()
+    vacation_table = fill_table(table, title, languages_vacations)
+    print(vacation_table.table)
 
 
 def take_sj_vacations(headers):
@@ -109,7 +118,6 @@ def take_sj_vacations(headers):
         count = page_payload["total"]
         vacations = page_payload["objects"]
         count = page_payload["total"]
-        languages_vacations[language] = {"vacancies_found": count}
         mid_summ = 0
         vacancies_processed = 0
         for vacation in vacations:
@@ -119,15 +127,19 @@ def take_sj_vacations(headers):
             if mid:
                 mid_summ += mid
                 vacancies_processed += 1
-        languages_vacations[language]["vacancies_processed"] = vacancies_processed
         if vacancies_processed == 0:
             average_salary = 0
         else:
             average_salary = int((mid_summ/vacancies_processed)//1)
-        languages_vacations[language]["average_salary"] = average_salary
+        languages_vacations[language] = {
+                "vacancies_found": count,
+                "vacancies_processed": vacancies_processed,
+                "average_salary": average_salary
+                }
     title = "SuperJob Moscow"
-    table = made_table(title, languages_vacations)
-    print(table.table)
+    table = made_table()
+    vacation_table = fill_table(table, title, languages_vacations)
+    print(vacation_table.table)
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
