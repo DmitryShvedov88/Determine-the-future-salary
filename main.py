@@ -71,7 +71,7 @@ def take_hh_vacations():
         pages_number = 1
         days = 5
         page = 0
-        while page < 3:
+        while page < pages_number:
             params = {
                 "text": language,
                 "period": days,
