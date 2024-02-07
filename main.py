@@ -39,7 +39,7 @@ def made_table():
     return table
 
 
-def predict_rub_salary(salary_from, salary_to):
+def predict_salary(salary_from, salary_to):
     """Find the number of vacancies by language,
     the average salary and the number of vacancies
     of which we considered the average"""
@@ -55,15 +55,23 @@ def predict_rub_salary(salary_from, salary_to):
     return midlle
 
 
+def predict_rub_salary(salary):
+    if salary:
+        if str(salary["currency"]) == "RUR":
+            salary_from, salary_to = salary["from"], salary["to"]
+            midlle = predict_salary(salary_from, salary_to)
+            return midlle
+
+
 def take_hh_vacations():
     """Request to the hh.ru website"""
 
     languages_vacations = {}
     for language in LANGUAGES:
         pages_number = 1
-        days = 1
+        days = 5
         page = 0
-        while page < pages_number:
+        while page < 3:
             params = {
                 "text": language,
                 "period": days,
@@ -80,14 +88,11 @@ def take_hh_vacations():
                 vacancies_processed = 0
                 for vacation in vacations:
                     salary = vacation["salary"]
-                    if salary:
-                        if str(salary["currency"]) == "RUR":
-                            salary_from, salary_to = salary["from"], salary["to"]
-                            mid = predict_rub_salary(salary_from, salary_to)
-                            if mid:
-                                mid_summ += mid
-                                vacancies_processed += 1
-                                time.sleep(0.1)
+                    mid = predict_rub_salary(salary)
+                    if mid:
+                        mid_summ += mid
+                        vacancies_processed += 1
+                    time.sleep(0.1)
             except requests.exceptions.HTTPError:
                 time.sleep(1)
             if vacancies_processed == 0:
@@ -123,7 +128,7 @@ def take_sj_vacations(headers):
         for vacation in vacations:
             vacation_counter += 1
             payment_from, payment_to = vacation["payment_from"], vacation["payment_to"]
-            mid = predict_rub_salary(payment_from, payment_to)
+            mid = predict_salary(payment_from, payment_to)
             if mid:
                 mid_summ += mid
                 vacancies_processed += 1
