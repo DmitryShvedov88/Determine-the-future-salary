@@ -24,7 +24,7 @@ But before that, you need to [register](https://api.superjob.ru/info/) your futu
 
 To run the program, you just need to enter 
 
-    "python main.py"
+    python main.py
 
 ### How to check
 Tables from two websites with vacancies in several programming languages will appear in the command line.
