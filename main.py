@@ -46,8 +46,6 @@ def predict_salary(salary_from, salary_to):
         midlle = int(salary_from) * 1.2
     else:
         midlle = (int(salary_from) + int(salary_to)) / 2
-    if midlle == 0:
-        return None
     return midlle
 
 
@@ -56,7 +54,7 @@ def predict_rub_salary(salary):
         return None
     if str(salary["currency"]) != "RUR":
         return None
-    if str(salary["currency"]) == "RUR":
+    else:
         midlle = predict_salary(salary["from"], salary["to"])
         return midlle
 
@@ -67,12 +65,13 @@ def take_hh_vacancies():
     languages_vacancies = {}
     for language in LANGUAGES:
         pages_number = 1
-        days = 5
+        days = 3
         page = 0
         while page < pages_number:
             params = {
                 "text": language,
                 "period": days,
+                "page": 0
             }
             try:
                 response = requests.get(
@@ -84,19 +83,20 @@ def take_hh_vacancies():
                 page_payload = response.json()
             except requests.exceptions.HTTPError:
                 time.sleep(1)
+                print("HTTPError")
+                break
             pages_number = page_payload["pages"]
             page += 1
             count = page_payload["found"]
             vacancies = page_payload["items"]
             mid_summ = 0
             vacancies_processed = 0
-            for vacation in vacancies:
-                salary = vacation["salary"]
+            for vacancy in vacancies:
+                salary = vacancy["salary"]
                 mid = predict_rub_salary(salary)
                 if mid:
                     mid_summ += mid
                     vacancies_processed += 1
-                time.sleep(0.1)
             if not vacancies_processed:
                 average_salary = 0
             else:
