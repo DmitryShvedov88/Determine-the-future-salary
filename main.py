@@ -116,17 +116,14 @@ def take_sj_vacancies(headers):
     for language in LANGUAGES:
         payload_status = True
         page = 0
-        vacancy_counter = 0
-        params = {
-            "keyword": f"{language}",
-            "town": "Москва",
-            "count": vacancies_on_page,
-            "page": page
-        }
-        
-        while payload_status == True:
-            print("language", language)
-            print('page', page)
+        while payload_status == True: 
+            vacancy_counter = 0
+            params = {
+                "keyword": f"{language}",
+                "town": "Москва",
+                "count": vacancies_on_page,
+                "page": page
+            }
             response = requests.get(
                 'https://api.superjob.ru/2.0/vacancies/',
                 headers=headers,
@@ -137,9 +134,7 @@ def take_sj_vacancies(headers):
             page_payload = response.json()
             vacancies = page_payload["objects"]
             count = page_payload["total"]
-            print("total", count)
             payload_status = page_payload["more"]
-            print("payload_status", payload_status)
             mid_summ = 0
             vacancies_processed = 0
             for vacancy in vacancies:
@@ -180,5 +175,5 @@ def print_sj_vacancies(headers):
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
     headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
-    #print_hh_vacancies()
+    print_hh_vacancies()
     print_sj_vacancies(headers)
