@@ -116,7 +116,7 @@ def take_sj_vacancies(headers):
     for language in LANGUAGES:
         payload_status = True
         page = 0
-        while payload_status == True: 
+        while payload_status is True:
             vacancy_counter = 0
             params = {
                 "keyword": f"{language}",
@@ -158,22 +158,14 @@ def take_sj_vacancies(headers):
     return languages_vacancies
 
 
-def print_hh_vacancies():
-    languages_vacancies = take_hh_vacancies()
-    title = "HeadHunter Moscow"
-    vacancy_table = made_table(title, languages_vacancies)
-    print(vacancy_table.table)
-
-
-def print_sj_vacancies(headers):
-    languages_vacancies = take_sj_vacancies(headers)
-    title = "SuperJob Moscow"
-    vacancy_table = made_table(title, languages_vacancies)
-    print(vacancy_table.table)
-
-
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
     headers = {"X-Api-App-Id": os.getenv("SUPERJOB_KEY")}
-    print_hh_vacancies()
-    print_sj_vacancies(headers)
+    languages_vacancies = take_hh_vacancies()
+    TITLE_HH = "HeadHunter Moscow"
+    vacancy_table = made_table(TITLE_HH, languages_vacancies)
+    print(vacancy_table.table)
+    languages_vacancies = take_sj_vacancies(headers)
+    TITLE_SJ = "SuperJob Moscow"
+    vacancy_table = made_table(TITLE_SJ, languages_vacancies)
+    print(vacancy_table.table)
