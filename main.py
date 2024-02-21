@@ -50,6 +50,7 @@ def predict_salary(salary_from, salary_to):
 
 
 def predict_rub_salary(salary):
+    """Function for calculating the ruble salary"""
     if not salary:
         return None
     if str(salary["currency"]) != "RUR":
@@ -61,7 +62,6 @@ def predict_rub_salary(salary):
 
 def take_hh_vacancies():
     """Request to the hh.ru website"""
-
     languages_vacancies = {}
     for language in LANGUAGES:
         pages_number = 1
