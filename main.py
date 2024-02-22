@@ -97,15 +97,15 @@ def take_hh_vacancies():
                 if mid:
                     mid_summ += mid
                     vacancies_processed += 1
-            if not vacancies_processed:
-                average_salary = 0
-            else:
-                average_salary = int((mid_summ / vacancies_processed) // 1)
-            languages_vacancies[language] = {
-                "vacancies_found": count,
-                "vacancies_processed": vacancies_processed,
-                "average_salary": average_salary
-            }
+        if not vacancies_processed:
+            average_salary = 0
+        else:
+            average_salary = int((mid_summ / vacancies_processed) // 1)
+        languages_vacancies[language] = {
+            "vacancies_found": count,
+            "vacancies_processed": vacancies_processed,
+            "average_salary": average_salary
+        }
     return languages_vacancies
 
 
@@ -116,7 +116,7 @@ def take_sj_vacancies(headers):
     for language in LANGUAGES:
         payload_status = True
         page = 0
-        while payload_status is True:
+        while payload_status:
             vacancy_counter = 0
             params = {
                 "keyword": f"{language}",
@@ -145,16 +145,16 @@ def take_sj_vacancies(headers):
                 if mid:
                     mid_summ += mid
                     vacancies_processed += 1
-            if not vacancies_processed:
-                average_salary = 0
-            else:
-                average_salary = int((mid_summ / vacancies_processed) // 1)
-            languages_vacancies[language] = {
-                "vacancies_found": count,
-                "vacancies_processed": vacancies_processed,
-                "average_salary": average_salary
-            }
             page += 1
+        if not vacancies_processed:
+            average_salary = 0
+        else:
+            average_salary = int((mid_summ / vacancies_processed) // 1)
+        languages_vacancies[language] = {
+            "vacancies_found": count,
+            "vacancies_processed": vacancies_processed,
+            "average_salary": average_salary
+        }
     return languages_vacancies
 
 
